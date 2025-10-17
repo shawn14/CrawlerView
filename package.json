@@ -1,0 +1,30 @@
+{
+  "name": "crawlerview",
+  "version": "1.2.0",
+  "description": "Test how AI crawlers see your website - SEO validation for ChatGPT, Claude, Google, and Bing with detailed explanations and fix recommendations",
+  "main": "index.js",
+  "bin": {
+    "crawlerview": "./cli.js"
+  },
+  "scripts": {
+    "test": "node cli.js https://example.com",
+    "local": "npm link",
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": [
+    "seo",
+    "crawler",
+    "ai",
+    "chatgpt",
+    "google",
+    "validation",
+    "accessibility"
+  ],
+  "author": "Tenzetta",
+  "license": "MIT",
+  "dependencies": {},
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}

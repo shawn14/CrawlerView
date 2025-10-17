@@ -1,0 +1,1223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CrawlerView - AI Crawler Accessibility Testing</title>
+  <meta name="description" content="Test how ChatGPT, Claude, Google, and Bing see your website. Validate SEO, structured data, and AI accessibility in seconds.">
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="CrawlerView - AI Crawler Accessibility Testing">
+  <meta property="og:description" content="See your website through the eyes of AI crawlers">
+  <meta property="og:type" content="website">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+      line-height: 1.6;
+      color: #1a1a1a;
+      background: #f7f7f8;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    header {
+      background: white;
+      border-bottom: 1px solid #e5e5e5;
+      padding: 24px 0;
+      margin-bottom: 40px;
+    }
+
+    .header-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    h1 {
+      font-size: 1.75rem;
+      font-weight: 600;
+      color: #1a1a1a;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .logo-icon {
+      font-size: 1.5rem;
+    }
+
+    .tagline {
+      font-size: 0.9rem;
+      color: #666;
+      font-weight: 400;
+    }
+
+    .main-card {
+      background: white;
+      border-radius: 8px;
+      border: 1px solid #e5e5e5;
+      padding: 32px;
+      margin-bottom: 24px;
+    }
+
+    .test-form {
+      margin-bottom: 32px;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    label {
+      display: block;
+      color: #1a1a1a;
+      font-weight: 500;
+      margin-bottom: 8px;
+      font-size: 0.95rem;
+    }
+
+    .input-wrapper {
+      display: flex;
+      gap: 12px;
+    }
+
+    input[type="url"] {
+      flex: 1;
+      padding: 12px 16px;
+      border: 1px solid #d9d9d9;
+      border-radius: 6px;
+      font-size: 0.95rem;
+      transition: border-color 0.2s;
+    }
+
+    input[type="url"]:focus {
+      outline: none;
+      border-color: #d97706;
+    }
+
+    button {
+      padding: 12px 24px;
+      background: #1a1a1a;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.95rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    button:hover {
+      background: #000;
+    }
+
+    button:disabled {
+      background: #d9d9d9;
+      cursor: not-allowed;
+      color: #999;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: #666;
+      display: none;
+    }
+
+    .loading.show {
+      display: block;
+    }
+
+    .spinner {
+      border: 3px solid #f0f0f0;
+      border-top: 3px solid #d97706;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 16px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .results {
+      display: none;
+    }
+
+    .results.show {
+      display: block;
+    }
+
+    .score-display {
+      text-align: center;
+      padding: 40px;
+      background: #fafafa;
+      border: 1px solid #e5e5e5;
+      border-radius: 8px;
+      margin-bottom: 24px;
+    }
+
+    .score-number {
+      font-size: 4rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: #1a1a1a;
+    }
+
+    .score-label {
+      font-size: 1.25rem;
+      font-weight: 500;
+      color: #666;
+    }
+
+    .score-excellent .score-number { color: #059669; }
+    .score-good .score-number { color: #d97706; }
+    .score-fair .score-number { color: #ea580c; }
+    .score-poor .score-number { color: #dc2626; }
+
+    .crawler-results {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .crawler-card {
+      background: #fafafa;
+      padding: 20px;
+      border-radius: 8px;
+      border: 1px solid #e5e5e5;
+    }
+
+    .crawler-name {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #1a1a1a;
+      margin-bottom: 12px;
+    }
+
+    .crawler-score {
+      font-size: 1.75rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+
+    .check-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+      font-size: 0.875rem;
+      color: #666;
+    }
+
+    .check-pass { color: #059669; }
+    .check-fail { color: #dc2626; }
+
+    .explanation-section {
+      background: white;
+      border: 1px solid #e5e5e5;
+      border-radius: 8px;
+      padding: 24px;
+      margin-bottom: 16px;
+    }
+
+    .explanation-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .explanation-header h3 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #1a1a1a;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .toggle-icon {
+      color: #999;
+      transition: transform 0.3s;
+    }
+
+    .toggle-icon.open {
+      transform: rotate(180deg);
+    }
+
+    .explanation-content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease-out;
+    }
+
+    .explanation-content.open {
+      max-height: 2000px;
+      transition: max-height 0.5s ease-in;
+    }
+
+    .explanation-body {
+      padding-top: 16px;
+      border-top: 1px solid #e5e5e5;
+      margin-top: 16px;
+    }
+
+    .impact-badge {
+      display: inline-block;
+      background: #fef3c7;
+      color: #92400e;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      margin-bottom: 12px;
+    }
+
+    .why-section {
+      background: #f9fafb;
+      padding: 16px;
+      border-radius: 6px;
+      margin: 16px 0;
+      border-left: 3px solid #d97706;
+    }
+
+    .why-section h4 {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #1a1a1a;
+      margin-bottom: 8px;
+    }
+
+    .why-section p {
+      font-size: 0.875rem;
+      color: #4b5563;
+      line-height: 1.6;
+    }
+
+    .fix-list {
+      margin: 16px 0;
+    }
+
+    .fix-list h4 {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #059669;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .fix-list ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .fix-list li {
+      padding: 8px 0 8px 24px;
+      position: relative;
+      font-size: 0.875rem;
+      color: #4b5563;
+      line-height: 1.5;
+    }
+
+    .fix-list li:before {
+      content: "→";
+      position: absolute;
+      left: 0;
+      color: #d97706;
+      font-weight: bold;
+    }
+
+    .code-example {
+      background: #1a1a1a;
+      color: #e5e5e5;
+      padding: 16px;
+      border-radius: 6px;
+      font-family: 'Monaco', 'Courier New', monospace;
+      font-size: 0.8rem;
+      overflow-x: auto;
+      margin: 16px 0;
+      line-height: 1.5;
+    }
+
+    .code-comment {
+      color: #10b981;
+    }
+
+    .robots-section {
+      background: #f0f9ff;
+      padding: 16px;
+      border-radius: 6px;
+      border-left: 3px solid #0284c7;
+      margin-bottom: 24px;
+    }
+
+    .robots-section h3 {
+      color: #0c4a6e;
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .robots-section p, .robots-section li {
+      font-size: 0.875rem;
+      color: #0c4a6e;
+    }
+
+    .crawler-info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .crawler-info-card {
+      background: white;
+      border: 1px solid #e5e5e5;
+      border-radius: 8px;
+      padding: 20px;
+    }
+
+    .crawler-info-card h4 {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #1a1a1a;
+      margin-bottom: 8px;
+    }
+
+    .crawler-info-card p {
+      font-size: 0.875rem;
+      color: #666;
+      margin-bottom: 8px;
+      line-height: 1.5;
+    }
+
+    .crawler-info-card a {
+      font-size: 0.8rem;
+      color: #d97706;
+      text-decoration: none;
+    }
+
+    .crawler-info-card a:hover {
+      text-decoration: underline;
+    }
+
+    footer {
+      text-align: center;
+      padding: 40px 20px;
+      color: #999;
+      font-size: 0.875rem;
+      border-top: 1px solid #e5e5e5;
+      margin-top: 60px;
+    }
+
+    .section-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #1a1a1a;
+      margin-bottom: 16px;
+    }
+
+    .badge-group {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+    }
+
+    .badge {
+      background: #f3f4f6;
+      color: #6b7280;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 500;
+    }
+
+    /* Copy button styles */
+    .copy-btn, .copy-btn-small {
+      padding: 6px 12px;
+      background: #f3f4f6;
+      color: #1a1a1a;
+      border: 1px solid #d9d9d9;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .copy-btn:hover, .copy-btn-small:hover {
+      background: #e5e5e5;
+      border-color: #b3b3b3;
+    }
+
+    .copy-btn.copied, .copy-btn-small.copied {
+      background: #d1fae5;
+      color: #065f46;
+      border-color: #10b981;
+    }
+
+    .copy-btn-small {
+      padding: 4px 8px;
+      font-size: 0.7rem;
+      margin-left: 8px;
+    }
+
+    /* Detailed report styles */
+    .detailed-report {
+      margin-top: 32px;
+    }
+
+    .report-section {
+      margin-bottom: 32px;
+    }
+
+    .report-section h2 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #1a1a1a;
+      margin-bottom: 16px;
+    }
+
+    .score-range {
+      font-size: 1.1rem;
+      color: #666;
+      margin-top: 8px;
+    }
+
+    .issue-card {
+      background: white;
+      border: 1px solid #e5e5e5;
+      border-radius: 8px;
+      padding: 24px;
+      margin-bottom: 20px;
+    }
+
+    .issue-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid #f3f4f6;
+    }
+
+    .issue-header h3 {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: #dc2626;
+    }
+
+    .issue-impact {
+      background: #fef3c7;
+      color: #92400e;
+      padding: 6px 14px;
+      border-radius: 16px;
+      font-size: 0.8rem;
+      font-weight: 500;
+    }
+
+    .issue-why {
+      margin-bottom: 20px;
+    }
+
+    .issue-why h4 {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #1a1a1a;
+      margin-bottom: 8px;
+    }
+
+    .issue-why p {
+      font-size: 0.9rem;
+      color: #4b5563;
+      line-height: 1.6;
+    }
+
+    .crawler-excerpts {
+      background: #f9fafb;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .crawler-excerpts h4 {
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: #1a1a1a;
+      margin-bottom: 16px;
+    }
+
+    .crawler-excerpt {
+      background: white;
+      border: 1px solid #e5e5e5;
+      border-radius: 6px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+
+    .crawler-excerpt:last-child {
+      margin-bottom: 0;
+    }
+
+    .crawler-excerpt .crawler-name {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #d97706;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 10px;
+    }
+
+    .crawler-excerpt blockquote {
+      margin: 0;
+      padding: 0;
+      border: none;
+    }
+
+    .crawler-excerpt blockquote p {
+      font-size: 0.9rem;
+      color: #374151;
+      line-height: 1.7;
+      font-style: italic;
+      margin-bottom: 8px;
+    }
+
+    .crawler-excerpt blockquote footer {
+      margin-top: 8px;
+    }
+
+    .crawler-excerpt blockquote cite {
+      font-style: normal;
+      font-size: 0.8rem;
+    }
+
+    .crawler-excerpt blockquote cite a {
+      color: #d97706;
+      text-decoration: none;
+    }
+
+    .crawler-excerpt blockquote cite a:hover {
+      text-decoration: underline;
+    }
+
+    .crawler-impact {
+      font-size: 0.85rem;
+      color: #4b5563;
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid #e5e5e5;
+    }
+
+    .crawler-impact strong {
+      color: #1a1a1a;
+    }
+
+    .fix-section {
+      background: #f0fdf4;
+      border-radius: 8px;
+      padding: 20px;
+      border-left: 4px solid #059669;
+    }
+
+    .fix-section h4 {
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: #065f46;
+      margin-bottom: 12px;
+    }
+
+    .fix-section p {
+      font-size: 0.9rem;
+      color: #374151;
+      line-height: 1.6;
+      margin-bottom: 12px;
+    }
+
+    .code-block-wrapper {
+      background: #1a1a1a;
+      border-radius: 6px;
+      margin: 16px 0;
+      overflow: hidden;
+    }
+
+    .code-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 12px;
+      background: #0d0d0d;
+      border-bottom: 1px solid #333;
+    }
+
+    .code-label {
+      font-size: 0.75rem;
+      color: #999;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-weight: 600;
+    }
+
+    .code-header .copy-btn {
+      padding: 4px 10px;
+      font-size: 0.7rem;
+    }
+
+    .code-block-wrapper pre {
+      margin: 0;
+      padding: 16px;
+      overflow-x: auto;
+    }
+
+    .code-block-wrapper code {
+      font-family: 'Monaco', 'Courier New', monospace;
+      font-size: 0.85rem;
+      line-height: 1.6;
+      color: #e5e5e5;
+    }
+
+    .recommendations {
+      margin-top: 16px;
+    }
+
+    .recommendations h5 {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #065f46;
+      margin-bottom: 10px;
+    }
+
+    .recommendations ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .recommendations li {
+      margin-bottom: 8px;
+    }
+
+    .recommendation-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 12px;
+      background: white;
+      border: 1px solid #d1fae5;
+      border-radius: 4px;
+      font-size: 0.85rem;
+      color: #374151;
+    }
+
+    .recommendation-item span {
+      flex: 1;
+      line-height: 1.5;
+    }
+
+    .crawler-result-card {
+      background: white;
+      border: 1px solid #e5e5e5;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+
+    .crawler-result-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #e5e5e5;
+    }
+
+    .crawler-result-header h3 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #1a1a1a;
+    }
+
+    .crawler-status {
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 0.8rem;
+      font-weight: 500;
+    }
+
+    .status-allowed {
+      background: #d1fae5;
+      color: #065f46;
+    }
+
+    .status-blocked {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .crawler-description {
+      font-size: 0.875rem;
+      color: #4b5563;
+      line-height: 1.6;
+      margin-bottom: 12px;
+    }
+
+    .crawler-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-top: 10px;
+      font-size: 0.8rem;
+    }
+
+    .crawler-links a {
+      color: #d97706;
+      text-decoration: none;
+    }
+
+    .crawler-links a:hover {
+      text-decoration: underline;
+    }
+
+    .user-agent-label {
+      color: #666;
+    }
+
+    .user-agent-label code {
+      background: #f3f4f6;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-size: 0.75rem;
+    }
+
+    .block-reason {
+      background: #fef3c7;
+      padding: 10px 12px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      color: #92400e;
+      margin-top: 10px;
+    }
+
+    .block-reason strong {
+      color: #78350f;
+    }
+
+    /* AI Agent Prompt Styles */
+    .ai-agent-section {
+      background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      border: 2px solid #0ea5e9;
+    }
+
+    .ai-agent-section h4 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #0c4a6e;
+      margin-bottom: 8px;
+    }
+
+    .ai-prompt-description {
+      font-size: 0.9rem;
+      color: #0c4a6e;
+      margin-bottom: 12px;
+      line-height: 1.6;
+    }
+
+    .ai-prompt-wrapper {
+      background: #1a1a1a;
+      border-radius: 6px;
+      overflow: hidden;
+      border: 1px solid #0ea5e9;
+    }
+
+    .ai-prompt-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 14px;
+      background: #0a0a0a;
+      border-bottom: 1px solid #0ea5e9;
+    }
+
+    .prompt-label {
+      font-size: 0.8rem;
+      color: #0ea5e9;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-weight: 600;
+    }
+
+    .ai-prompt-header .copy-btn {
+      background: #0ea5e9;
+      color: white;
+      border: none;
+    }
+
+    .ai-prompt-header .copy-btn:hover {
+      background: #0284c7;
+    }
+
+    .ai-prompt-header .copy-btn.copied {
+      background: #10b981;
+      color: white;
+      border-color: #10b981;
+    }
+
+    .ai-prompt-wrapper pre {
+      margin: 0;
+      padding: 16px;
+      overflow-x: auto;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+
+    .ai-prompt-code {
+      font-family: 'Monaco', 'Courier New', monospace;
+      font-size: 0.85rem;
+      line-height: 1.7;
+      color: #e5e5e5;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <div>
+        <h1><span class="logo-icon">🔍</span> CrawlerView</h1>
+        <p class="tagline">Test how AI crawlers see your website</p>
+      </div>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="main-card">
+      <div class="badge-group">
+        <div class="badge">GPTBot (OpenAI)</div>
+        <div class="badge">ClaudeBot (Anthropic)</div>
+        <div class="badge">Googlebot (Google)</div>
+        <div class="badge">BingBot (Bing)</div>
+      </div>
+
+      <div class="test-form">
+        <form id="testForm">
+          <div class="form-group">
+            <label for="urlInput">Enter URL to Test</label>
+            <div class="input-wrapper">
+              <input
+                type="url"
+                id="urlInput"
+                placeholder="https://example.com"
+                required
+              >
+              <button type="submit" id="testButton">Test Now</button>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <div class="loading" id="loading">
+        <div class="spinner"></div>
+        <p>Testing with AI crawlers...</p>
+      </div>
+
+      <div class="results" id="results">
+        <div class="score-display" id="scoreDisplay">
+          <div class="score-number" id="scoreNumber">0</div>
+          <div class="score-label" id="scoreLabel">Loading...</div>
+        </div>
+
+        <div id="robotsSection"></div>
+
+        <h2 class="section-title">Crawler Results</h2>
+        <div class="crawler-results" id="crawlerResults"></div>
+
+        <div id="explanationsSection"></div>
+
+        <div id="detailedExplanations"></div>
+
+        <h2 class="section-title">About These Crawlers</h2>
+        <div class="crawler-info-grid">
+          <div class="crawler-info-card">
+            <h4>GPTBot (OpenAI)</h4>
+            <p>OpenAI's web crawler that collects content to train and improve AI models like ChatGPT. Respects robots.txt and filters out paywalled content.</p>
+            <a href="https://platform.openai.com/docs/gptbot" target="_blank">View Documentation →</a>
+          </div>
+          <div class="crawler-info-card">
+            <h4>ClaudeBot (Anthropic)</h4>
+            <p>Anthropic's crawler for AI model training and web search. Respects crawl-delay settings and anti-circumvention technology.</p>
+            <a href="https://support.claude.com/en/articles/8896518" target="_blank">View Documentation →</a>
+          </div>
+          <div class="crawler-info-card">
+            <h4>Googlebot (Google)</h4>
+            <p>Google's primary crawler running on thousands of machines simultaneously. Supports HTTP/2, compression, and uses caching for efficiency.</p>
+            <a href="https://developers.google.com/search/docs/crawling-indexing/overview-google-crawlers" target="_blank">View Documentation →</a>
+          </div>
+          <div class="crawler-info-card">
+            <h4>BingBot (Microsoft)</h4>
+            <p>Microsoft's web crawler for Bing search. Supports IndexNow protocol for instant crawling and offers crawl control tools.</p>
+            <a href="https://www.bing.com/webmasters" target="_blank">View Documentation →</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <p>Built for better AI accessibility • Based on official documentation from OpenAI, Anthropic, Google, and Bing</p>
+  </footer>
+
+  <script src="/explanations-data.js"></script>
+  <script src="/display-functions.js"></script>
+  <script>
+    const form = document.getElementById('testForm');
+    const loading = document.getElementById('loading');
+    const results = document.getElementById('results');
+    const testButton = document.getElementById('testButton');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const url = document.getElementById('urlInput').value;
+
+      loading.classList.add('show');
+      results.classList.remove('show');
+      testButton.disabled = true;
+
+      try {
+        const response = await fetch('/api/test', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ url })
+        });
+
+        const data = await response.json();
+
+        loading.classList.remove('show');
+        displayResults(data);
+        results.classList.add('show');
+
+      } catch (error) {
+        alert('Error testing URL: ' + error.message);
+        loading.classList.remove('show');
+      } finally {
+        testButton.disabled = false;
+      }
+    });
+
+    function displayResults(data) {
+      const scoreDisplay = document.getElementById('scoreDisplay');
+      const scoreNumber = document.getElementById('scoreNumber');
+      const scoreLabel = document.getElementById('scoreLabel');
+
+      scoreNumber.textContent = Math.round(data.averageScore);
+
+      let label, className;
+      if (data.averageScore >= 80) {
+        label = 'Excellent';
+        className = 'score-excellent';
+      } else if (data.averageScore >= 60) {
+        label = 'Good';
+        className = 'score-good';
+      } else if (data.averageScore >= 40) {
+        label = 'Fair';
+        className = 'score-fair';
+      } else {
+        label = 'Poor';
+        className = 'score-poor';
+      }
+
+      scoreLabel.textContent = label;
+      scoreDisplay.className = 'score-display ' + className;
+
+      // Display robots.txt
+      const robotsSection = document.getElementById('robotsSection');
+      if (data.robotsTxt) {
+        let robotsHTML = '<div class="robots-section">';
+        robotsHTML += '<h3>🤖 robots.txt Status</h3>';
+
+        if (data.robotsTxt.accessible) {
+          robotsHTML += '<p>✓ robots.txt is accessible</p>';
+          if (data.robotsTxt.issues && data.robotsTxt.issues.length > 0) {
+            robotsHTML += '<ul style="margin-top: 8px; list-style: none; padding-left: 0;">';
+            data.robotsTxt.issues.forEach(issue => {
+              robotsHTML += `<li style="padding: 4px 0;">⚠ ${issue}</li>`;
+            });
+            robotsHTML += '</ul>';
+          }
+        } else {
+          robotsHTML += `<p>⚠ ${data.robotsTxt.error}</p>`;
+        }
+
+        robotsHTML += '</div>';
+        robotsSection.innerHTML = robotsHTML;
+      }
+
+      // Display crawler results
+      const crawlerResults = document.getElementById('crawlerResults');
+      crawlerResults.innerHTML = '';
+
+      data.crawlers.forEach(crawler => {
+        const card = document.createElement('div');
+        card.className = 'crawler-card';
+
+        let html = `<div class="crawler-name">${crawler.crawler || crawler.name}</div>`;
+
+        if (crawler.error) {
+          html += `<p style="color: #dc2626;">Error: ${crawler.error}</p>`;
+        } else {
+          const scoreColor = crawler.score >= 80 ? '#059669' :
+                             crawler.score >= 60 ? '#d97706' :
+                             crawler.score >= 40 ? '#ea580c' : '#dc2626';
+
+          html += `<div class="crawler-score" style="color: ${scoreColor}">${crawler.score}/100</div>`;
+
+          html += `<div class="check-item ${crawler.hasContent ? 'check-pass' : 'check-fail'}">
+            ${crawler.hasContent ? '✓' : '✗'} Content (${crawler.contentLength} chars)
+          </div>`;
+
+          html += `<div class="check-item ${crawler.hasNoscript ? 'check-pass' : 'check-fail'}">
+            ${crawler.hasNoscript ? '✓' : '✗'} Noscript fallback
+          </div>`;
+
+          html += `<div class="check-item ${crawler.hasStructuredData ? 'check-pass' : 'check-fail'}">
+            ${crawler.hasStructuredData ? '✓' : '✗'} Structured data
+          </div>`;
+
+          html += `<div class="check-item ${crawler.hasMetaTags ? 'check-pass' : 'check-fail'}">
+            ${crawler.hasMetaTags ? '✓' : '✗'} Meta tags
+          </div>`;
+
+          html += `<div class="check-item ${crawler.hasH1 ? 'check-pass' : 'check-fail'}">
+            ${crawler.hasH1 ? '✓' : '✗'} H1 heading
+          </div>`;
+
+          html += `<div class="check-item ${!crawler.hasLoadingState ? 'check-pass' : 'check-fail'}">
+            ${!crawler.hasLoadingState ? '✓' : '✗'} No loading state
+          </div>`;
+        }
+
+        card.innerHTML = html;
+        crawlerResults.appendChild(card);
+      });
+
+      // Display explanations for issues found
+      displayExplanations(data);
+
+      // Display detailed explanations with crawler-specific excerpts
+      displayDetailedExplanations(data);
+    }
+
+    function displayExplanations(data) {
+      const issueTypes = new Set();
+      data.crawlers.forEach(result => {
+        if (!result.hasContent) issueTypes.add('content');
+        if (!result.hasNoscript) issueTypes.add('noscript');
+        if (!result.hasStructuredData) issueTypes.add('structuredData');
+        if (!result.hasMetaTags) issueTypes.add('metaTags');
+        if (!result.hasH1) issueTypes.add('h1');
+        if (result.hasLoadingState) issueTypes.add('loadingState');
+      });
+
+      const explanationsSection = document.getElementById('explanationsSection');
+
+      if (issueTypes.size === 0) {
+        explanationsSection.innerHTML = '<div class="explanation-section"><p style="color: #059669; font-weight: 500;">✓ No issues found! Your page is well-optimized for AI crawlers.</p></div>';
+        return;
+      }
+
+      let html = '<h2 class="section-title">Issues & How to Fix Them</h2>';
+
+      issueTypes.forEach(issueType => {
+        const explanation = window.SCORING_EXPLANATIONS[issueType];
+        if (!explanation) return;
+
+        const id = `explain-${issueType}`;
+
+        html += `<div class="explanation-section">
+          <div class="explanation-header" onclick="toggleExplanation('${id}')">
+            <h3>❌ ${explanation.title}</h3>
+            <span class="toggle-icon" id="${id}-icon">▼</span>
+          </div>
+          <div class="explanation-content" id="${id}">
+            <div class="explanation-body">
+              <div class="impact-badge">Impact: ${explanation.weight} points</div>
+
+              <div class="why-section">
+                <h4>Why This Matters</h4>
+                <p>${explanation.why.general}</p>
+              </div>`;
+
+        if (explanation.fix && explanation.fix.recommended) {
+          html += `<div class="fix-list">
+            <h4>✓ How to Fix</h4>
+            <ul>`;
+
+          explanation.fix.recommended.forEach(rec => {
+            html += `<li>${rec}</li>`;
+          });
+
+          html += `</ul></div>`;
+        }
+
+        if (explanation.fix && explanation.fix.example) {
+          html += `<div class="code-example">${escapeHtml(explanation.fix.example)}</div>`;
+        }
+
+        html += `</div></div></div>`;
+      });
+
+      explanationsSection.innerHTML = html;
+    }
+
+    function toggleExplanation(id) {
+      const content = document.getElementById(id);
+      const icon = document.getElementById(id + '-icon');
+
+      content.classList.toggle('open');
+      icon.classList.toggle('open');
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+  </script>
+
+  <noscript>
+    <div style="padding: 40px; text-align: center; background: #fef3c7; margin: 20px; border-radius: 8px;">
+      <h2>JavaScript Required</h2>
+      <p>This web interface requires JavaScript. Use the CLI tool for testing:</p>
+      <code style="background: #1a1a1a; color: #e5e5e5; padding: 8px 16px; border-radius: 4px;">npm install -g crawlerview && crawlerview https://example.com</code>
+    </div>
+  </noscript>
+</body>
+</html>

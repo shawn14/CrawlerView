@@ -10,7 +10,8 @@
     "test": "node cli.js https://example.com",
     "local": "npm link",
     "start": "node server.js",
-    "dev": "node server.js"
+    "dev": "node server.js",
+    "build": "echo 'No build step required for pure Node.js'"
   },
   "keywords": [
     "seo",

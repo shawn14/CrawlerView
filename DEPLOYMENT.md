@@ -1,242 +1,179 @@
-# CrawlerView Web Application - Deployment Guide
+# CrawlerView Deployment Guide
 
-## Project Overview
+## Architecture
 
-Successfully converted CrawlerView CLI tool into a fully functional web application!
+**Hybrid Deployment:**
+- **Google Cloud Run**: Backend API (handles crawler testing with no timeout limits)
+- **Vercel**: Frontend (serves static HTML/CSS/JS via CDN)
 
-**Location**: `/Users/shawncarpenter/Desktop/CrawlerView/crawlerview-web/`
+## Prerequisites
 
-## What Was Built
+1. **Google Cloud SDK** installed: https://cloud.google.com/sdk/docs/install
+2. **Vercel CLI** (optional): `npm i -g vercel`
+3. **Google Cloud billing account** linked
 
-### Architecture
-- **Framework**: Next.js 15 with App Router
-- **Language**: TypeScript
-- **Styling**: Tailwind CSS
-- **Deployment Target**: Vercel (serverless)
-- **API**: Next.js API Routes (serverless functions)
-
-### Features Implemented
-- ✅ Beautiful responsive UI with Tailwind CSS
-- ✅ URL input form with validation
-- ✅ Real-time loading states with animations
-- ✅ Comprehensive results display with:
-  - Overall score (0-100)
-  - Per-crawler results (GPTBot, ClaudeBot, GoogleBot, BingBot)
-  - robots.txt validation
-  - Redirect chain visualization
-  - Actionable recommendations
-- ✅ Built-in rate limiting (10 req/min per IP)
-- ✅ Error handling and user feedback
-- ✅ Mobile responsive design
-- ✅ SEO optimized metadata
-
-### Project Structure
-```
-crawlerview-web/
-├── app/
-│   ├── api/test/route.ts          # API endpoint (60s timeout configured)
-│   ├── components/
-│   │   ├── TestForm.tsx           # URL input + validation
-│   │   ├── LoadingState.tsx       # Animated loading UI
-│   │   └── ResultsDisplay.tsx     # Results visualization
-│   ├── page.tsx                   # Main home page
-│   ├── layout.tsx                 # Root layout with metadata
-│   └── globals.css                # Global styles
-├── lib/
-│   └── crawler.ts                 # Core TypeScript crawler logic
-├── vercel.json                    # Vercel config (60s function timeout)
-└── package.json
-```
-
-## Local Development
-
-### Currently Running
-The dev server is currently running at: **http://localhost:3001**
-
-### Commands
-```bash
-cd crawlerview-web
-
-# Development
-npm run dev        # Start dev server (running now)
-
-# Production build
-npm run build      # Build for production
-npm start          # Start production server
-
-# Linting
-npm run lint
-```
-
-## Deployment to Vercel
-
-### Option 1: GitHub + Vercel (Recommended)
-
-1. **Initialize Git** (if not already done):
-```bash
-cd crawlerview-web
-git init
-git add .
-git commit -m "Initial commit: CrawlerView web application"
-```
-
-2. **Push to GitHub**:
-```bash
-# Create a new repo on GitHub first, then:
-git remote add origin https://github.com/YOUR_USERNAME/crawlerview-web.git
-git branch -M main
-git push -u origin main
-```
-
-3. **Deploy on Vercel**:
-   - Go to [vercel.com](https://vercel.com)
-   - Click "Import Project"
-   - Select your GitHub repository
-   - Vercel will auto-detect Next.js settings
-   - Click "Deploy"
-   - Done! Your site will be live in ~2 minutes
-
-### Option 2: Vercel CLI
+## Step 1: Create New Google Cloud Project
 
 ```bash
-npm install -g vercel
-cd crawlerview-web
-vercel
+# Create the project
+gcloud projects create crawlerview-prod --name="CrawlerView Production"
+
+# Set as default project
+gcloud config set project crawlerview-prod
+
+# Link billing account (replace BILLING_ACCOUNT_ID with your billing account)
+# Find your billing account: gcloud billing accounts list
+gcloud billing projects link crawlerview-prod --billing-account=BILLING_ACCOUNT_ID
+
+# Enable required APIs
+gcloud services enable run.googleapis.com
+gcloud services enable cloudbuild.googleapis.com
 ```
 
-Follow the prompts to deploy.
+## Step 2: Deploy Backend to Cloud Run
 
-### Option 3: Deploy to Other Platforms
-
-#### Railway
 ```bash
-# Install Railway CLI
-npm install -g railway
+# Navigate to project directory
+cd /Users/shawncarpenter/Desktop/CrawlerView
 
-# Deploy
-railway login
-railway init
-railway up
+# Deploy to Cloud Run (this will auto-detect Node.js and build without Dockerfile)
+gcloud run deploy crawlerview \
+  --source . \
+  --platform managed \
+  --region us-central1 \
+  --allow-unauthenticated \
+  --port 3000 \
+  --memory 512Mi \
+  --cpu 1 \
+  --timeout 300s \
+  --max-instances 10 \
+  --project crawlerview-prod
+
+# After deployment completes, you'll get a URL like:
+# https://crawlerview-xxxxx-uc.a.run.app
 ```
 
-#### DigitalOcean App Platform
-1. Push code to GitHub
-2. Go to DigitalOcean App Platform
-3. Create new app from GitHub repo
-4. Set build command: `npm run build`
-5. Set run command: `npm start`
+**Copy the Cloud Run URL** - you'll need it for Step 3.
 
-## Configuration Details
+## Step 3: Configure Vercel Frontend
 
-### Vercel Configuration
-The `vercel.json` file is configured for:
-- **60-second timeout** for API routes (required for crawler tests)
-- Automatic serverless function deployment
-- Edge network optimization
+Update `vercel.json` to proxy API calls to Cloud Run.
+
+Replace the existing content with:
 
 ```json
 {
-  "functions": {
-    "app/api/**/*.ts": {
-      "maxDuration": 60
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "https://crawlerview-xxxxx-uc.a.run.app/api/:path*"
     }
-  }
+  ]
 }
 ```
 
-### Rate Limiting
-- **Limit**: 10 requests per minute per IP
-- **Implementation**: In-memory (simple)
-- **For Production**: Consider upgrading to Redis-based rate limiting for multi-instance deployments
+Replace `https://crawlerview-xxxxx-uc.a.run.app` with your actual Cloud Run URL.
 
-### Security Features
-- ✅ Blocks local/private IP testing
-- ✅ URL validation
-- ✅ Input sanitization
-- ✅ Rate limiting
-- ✅ CORS headers configured
+## Step 4: Deploy Frontend to Vercel
 
-## Scaling Considerations
+```bash
+# Commit changes
+git add -A
+git commit -m "Configure Cloud Run backend URL
 
-### Current Setup (Small-Medium Scale)
-- **Capacity**: 100-1000 requests/day
-- **Architecture**: Serverless (auto-scales on Vercel)
-- **No database required**: Completely stateless
-- **Cost**: Free tier on Vercel covers this easily
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
-### Future Enhancements (If Needed)
-1. **Add caching**: Cache crawler results for 1 hour to reduce load
-2. **Queue system**: Use BullMQ or AWS SQS for async processing
-3. **Database**: Add PostgreSQL/Supabase for user accounts and history
-4. **Redis**: For distributed rate limiting
-5. **CDN**: Vercel includes this automatically
+Co-Authored-By: Claude <noreply@anthropic.com>"
 
-## Environment Variables
+git push origin main
 
-**None required!** The application is completely stateless and requires no configuration.
+# Vercel will auto-deploy from GitHub
+# Or manually deploy:
+vercel --prod
+```
 
-## Testing
+## Step 5: Verify Deployment
 
-The application is ready to test at http://localhost:3001
+1. Visit your Vercel URL: `https://your-project.vercel.app`
+2. Enter a URL to test (e.g., `example.com`)
+3. Check that crawler results load (this confirms Cloud Run is working)
 
-Try testing these URLs:
-- `https://example.com`
-- `https://github.com`
-- `https://openai.com`
+## Updating the App
+
+### Update Backend (Cloud Run):
+```bash
+# Make code changes
+git add -A
+git commit -m "Update backend"
+
+# Redeploy to Cloud Run
+gcloud run deploy crawlerview \
+  --source . \
+  --platform managed \
+  --region us-central1 \
+  --project crawlerview-prod
+```
+
+### Update Frontend (Vercel):
+```bash
+# Make code changes
+git add -A
+git commit -m "Update frontend"
+git push origin main
+
+# Vercel auto-deploys
+```
 
 ## Monitoring
 
-For production monitoring, consider:
-- **Vercel Analytics**: Built-in (free)
-- **Sentry**: Error tracking
-- **LogRocket**: User session replay
-- **Uptime monitoring**: UptimeRobot or Pingdom
+### View Cloud Run Logs:
+```bash
+gcloud run logs tail crawlerview --project crawlerview-prod
+```
 
-## Custom Domain
+### View Cloud Run Metrics:
+https://console.cloud.google.com/run?project=crawlerview-prod
 
-To add a custom domain on Vercel:
-1. Go to your project settings
-2. Click "Domains"
-3. Add your domain (e.g., `crawlerview.com`)
-4. Update DNS records as instructed
-5. SSL is automatic!
+### View Vercel Logs:
+https://vercel.com/dashboard → Your Project → Logs
 
-## Performance Metrics
+## Cost Estimate
 
-- **Build time**: ~2 seconds
-- **First Load JS**: 117 KB (excellent)
-- **Time to Interactive**: < 1 second
-- **Lighthouse Score**: 95+ expected
+**Cloud Run:**
+- First 2 million requests/month: FREE
+- After that: ~$0.40 per million requests
+- Typical usage: $0-5/month for low-medium traffic
 
-## Success Criteria ✅
+**Vercel:**
+- Hobby plan: FREE (includes 100GB bandwidth)
+- Pro plan: $20/month (if you need more)
 
-All features implemented and working:
-- ✅ Core functionality working
-- ✅ UI is responsive and polished
-- ✅ Build succeeds without errors
-- ✅ Dev server runs successfully
-- ✅ Rate limiting implemented
-- ✅ Error handling complete
-- ✅ Ready for production deployment
+**Total estimated cost: $0-10/month**
 
-## Next Steps
+## Troubleshooting
 
-1. **Test the application** at http://localhost:3001
-2. **Deploy to Vercel** using Option 1 above
-3. **Add custom domain** (optional)
-4. **Monitor usage** and adjust rate limits if needed
-5. **Collect feedback** from users
+### Cloud Run deployment fails:
+```bash
+# Check logs
+gcloud run logs tail crawlerview --project crawlerview-prod
 
-## Support
+# Verify buildpacks detected Node.js
+gcloud builds list --project crawlerview-prod
+```
 
-For issues or questions:
-- Check Next.js docs: https://nextjs.org/docs
-- Check Vercel docs: https://vercel.com/docs
-- Review the original CLI tool: `../cli.js` and `../index.js`
+### Frontend can't reach backend:
+1. Check CORS is enabled in `server.js` (already configured)
+2. Verify Cloud Run URL in `vercel.json` is correct
+3. Check Cloud Run allows unauthenticated requests
+4. Test Cloud Run URL directly: `curl https://your-cloud-run-url/api/test -X POST -H "Content-Type: application/json" -d '{"url":"example.com"}'`
 
----
+### Timeout errors:
+- Cloud Run timeout is set to 300s (5 minutes) - should be plenty
+- If still timing out, increase: `--timeout 600s`
 
-**Built by**: Tenzetta
-**Date**: October 2025
-**Technology**: Next.js 15, TypeScript, Tailwind CSS
-**Deployment**: Vercel-optimized serverless architecture
+## Security Notes
+
+- Cloud Run is set to `--allow-unauthenticated` (public API)
+- Consider adding rate limiting for production
+- Monitor costs in Google Cloud Console
+- Set up billing alerts

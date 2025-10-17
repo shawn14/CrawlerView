@@ -67,6 +67,99 @@
       font-weight: 400;
     }
 
+    .hero-section {
+      text-align: center;
+      max-width: 800px;
+      margin: 0 auto 60px;
+    }
+
+    .hero-text {
+      font-size: 1.25rem;
+      color: #4b5563;
+      line-height: 1.8;
+      margin-bottom: 24px;
+    }
+
+    .feature-badges {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 32px;
+    }
+
+    .feature-badge {
+      font-size: 0.9rem;
+      color: #059669;
+      font-weight: 500;
+    }
+
+    .try-examples {
+      text-align: center;
+      margin-top: 12px;
+      font-size: 0.875rem;
+      color: #6b7280;
+    }
+
+    .try-examples a {
+      color: #2563eb;
+      text-decoration: none;
+      margin: 0 8px;
+    }
+
+    .try-examples a:hover {
+      text-decoration: underline;
+    }
+
+    .what-we-test-section {
+      margin-bottom: 60px;
+    }
+
+    .section-title-center {
+      text-align: center;
+      font-size: 2rem;
+      font-weight: 600;
+      color: #1a1a1a;
+      margin-bottom: 40px;
+    }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 24px;
+    }
+
+    .feature-card {
+      background: white;
+      border: 1px solid #e5e5e5;
+      border-radius: 8px;
+      padding: 24px;
+      transition: all 0.2s;
+    }
+
+    .feature-card:hover {
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      transform: translateY(-2px);
+    }
+
+    .feature-icon {
+      font-size: 2.5rem;
+      margin-bottom: 12px;
+    }
+
+    .feature-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #1a1a1a;
+      margin-bottom: 8px;
+    }
+
+    .feature-description {
+      font-size: 0.9rem;
+      color: #6b7280;
+      line-height: 1.6;
+    }
+
     .main-card {
       background: white;
       border-radius: 8px;
@@ -94,25 +187,27 @@
     .input-wrapper {
       display: flex;
       gap: 12px;
+      max-width: 600px;
+      margin: 0 auto;
     }
 
-    input[type="url"] {
+    input[type="text"], input[type="url"] {
       flex: 1;
-      padding: 12px 16px;
+      padding: 14px 18px;
       border: 1px solid #d9d9d9;
       border-radius: 6px;
       font-size: 0.95rem;
       transition: border-color 0.2s;
     }
 
-    input[type="url"]:focus {
+    input[type="text"]:focus, input[type="url"]:focus {
       outline: none;
-      border-color: #d97706;
+      border-color: #2563eb;
     }
 
     button {
       padding: 12px 24px;
-      background: #1a1a1a;
+      background: #2563eb;
       color: white;
       border: none;
       border-radius: 6px;
@@ -123,7 +218,7 @@
     }
 
     button:hover {
-      background: #000;
+      background: #1d4ed8;
     }
 
     button:disabled {
@@ -167,25 +262,208 @@
     }
 
     .score-display {
-      text-align: center;
-      padding: 40px;
-      background: #fafafa;
-      border: 1px solid #e5e5e5;
-      border-radius: 8px;
+      background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 50%, #3b82f6 100%);
+      border-radius: 12px;
+      padding: 32px;
+      margin-bottom: 24px;
+      color: white;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .score-display::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(45deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 100%);
+      pointer-events: none;
+    }
+
+    .score-content {
+      position: relative;
+      z-index: 1;
+    }
+
+    .score-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       margin-bottom: 24px;
     }
 
+    .score-badge-container {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .score-circle {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
     .score-number {
-      font-size: 4rem;
+      font-size: 1.75rem;
       font-weight: 700;
-      margin-bottom: 8px;
+      color: #1e40af;
+      line-height: 1;
+    }
+
+    .score-max {
+      font-size: 0.75rem;
+      color: #6b7280;
+      margin-top: 2px;
+    }
+
+    .score-badge-label {
+      background: #10b981;
+      color: white;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .mini-crawler-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .mini-crawler-card {
+      background: rgba(255,255,255,0.15);
+      backdrop-filter: blur(10px);
+      padding: 12px;
+      border-radius: 8px;
+      text-align: center;
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+
+    .mini-crawler-name {
+      font-size: 0.75rem;
+      margin-bottom: 6px;
+      opacity: 0.9;
+    }
+
+    .mini-crawler-score {
+      font-size: 1.25rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+    }
+
+    .mini-score-badge {
+      background: #10b981;
+      color: white;
+      font-size: 0.7rem;
+      padding: 2px 6px;
+      border-radius: 8px;
+      font-weight: 600;
+    }
+
+    .rainbow-progress {
+      height: 8px;
+      background: #e5e7eb;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 20px;
+      position: relative;
+    }
+
+    .rainbow-progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, #ef4444 0%, #f59e0b 25%, #10b981 50%, #3b82f6 75%, #8b5cf6 100%);
+      border-radius: 4px;
+      transition: width 0.6s ease;
+    }
+
+    .share-buttons {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .share-btn {
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .share-twitter {
+      background: white;
       color: #1a1a1a;
     }
 
-    .score-label {
-      font-size: 1.25rem;
-      font-weight: 500;
-      color: #666;
+    .share-twitter:hover {
+      background: #f3f4f6;
+    }
+
+    .share-linkedin {
+      background: #0a66c2;
+      color: white;
+    }
+
+    .share-linkedin:hover {
+      background: #004182;
+    }
+
+    .share-copy {
+      background: rgba(255,255,255,0.2);
+      color: white;
+      border: 1px solid rgba(255,255,255,0.3);
+    }
+
+    .share-copy:hover {
+      background: rgba(255,255,255,0.3);
+    }
+
+    .share-copy.copied {
+      background: #10b981;
+      border-color: #10b981;
+    }
+
+    .verified-section {
+      background: white;
+      border: 2px solid #10b981;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .verified-icon {
+      font-size: 1.5rem;
+    }
+
+    .verified-text {
+      color: #065f46;
+      font-weight: 600;
+      font-size: 1rem;
     }
 
     .score-excellent .score-number { color: #059669; }
@@ -195,23 +473,42 @@
 
     .crawler-results {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 16px;
+      grid-template-columns: 1fr;
+      gap: 20px;
       margin-bottom: 24px;
     }
 
     .crawler-card {
-      background: #fafafa;
-      padding: 20px;
+      background: white;
+      padding: 24px;
       border-radius: 8px;
       border: 1px solid #e5e5e5;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    .crawler-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid #f3f4f6;
     }
 
     .crawler-name {
-      font-size: 1rem;
+      font-size: 1.1rem;
       font-weight: 600;
       color: #1a1a1a;
-      margin-bottom: 12px;
+      margin-bottom: 0;
+    }
+
+    .crawler-score-badge {
+      background: #10b981;
+      color: white;
+      padding: 6px 14px;
+      border-radius: 16px;
+      font-size: 0.85rem;
+      font-weight: 600;
     }
 
     .crawler-score {
@@ -220,17 +517,80 @@
       margin-bottom: 12px;
     }
 
+    .crawler-meta {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+
+    .meta-tag {
+      background: #f3f4f6;
+      color: #4b5563;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+
+    .checks-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
     .check-item {
       display: flex;
       align-items: center;
       gap: 8px;
-      margin-bottom: 6px;
-      font-size: 0.875rem;
+      font-size: 0.85rem;
       color: #666;
     }
 
     .check-pass { color: #059669; }
     .check-fail { color: #dc2626; }
+
+    .content-preview {
+      background: #f9fafb;
+      border-radius: 8px;
+      padding: 16px;
+      margin-top: 16px;
+      border-left: 3px solid #3b82f6;
+    }
+
+    .content-preview-header {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #1a1a1a;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .content-item {
+      margin-bottom: 12px;
+    }
+
+    .content-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .content-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #6b7280;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+
+    .content-text {
+      font-size: 0.875rem;
+      color: #374151;
+      line-height: 1.5;
+    }
 
     .explanation-section {
       background: white;
@@ -908,38 +1268,86 @@
 <body>
   <header>
     <div class="header-content">
-      <div>
-        <h1><span class="logo-icon">🔍</span> CrawlerView</h1>
-        <p class="tagline">Test how AI crawlers see your website</p>
+      <div style="width: 100%; text-align: center;">
+        <h1 style="justify-content: center; margin-bottom: 8px;"><span class="logo-icon">🔍</span> CrawlerView</h1>
+        <p class="tagline">See your website through the eyes of AI crawlers</p>
       </div>
     </div>
   </header>
 
   <div class="container">
-    <div class="main-card">
-      <div class="badge-group">
-        <div class="badge">GPTBot (OpenAI)</div>
-        <div class="badge">ClaudeBot (Anthropic)</div>
-        <div class="badge">Googlebot (Google)</div>
-        <div class="badge">BingBot (Bing)</div>
+    <div class="hero-section">
+      <p class="hero-text">Test how ChatGPT, Claude, Google, and Bing see your website. Validate SEO, structured data, and AI accessibility in seconds.</p>
+
+      <div class="feature-badges">
+        <div class="feature-badge">✓ Tests 4 major AI crawlers</div>
+        <div class="feature-badge">✓ Follows redirects automatically</div>
+        <div class="feature-badge">✓ Instant results</div>
+        <div class="feature-badge">✓ No login required</div>
       </div>
 
       <div class="test-form">
         <form id="testForm">
           <div class="form-group">
-            <label for="urlInput">Enter URL to Test</label>
+            <label for="urlInput">Enter a URL to test</label>
             <div class="input-wrapper">
               <input
-                type="url"
+                type="text"
                 id="urlInput"
-                placeholder="https://example.com"
+                placeholder="example.com or www.example.com"
                 required
               >
-              <button type="submit" id="testButton">Test Now</button>
+              <button type="submit" id="testButton">Test URL</button>
             </div>
+            <p class="try-examples">Try: <a href="#" onclick="testExample('example.com'); return false;">example.com</a> <a href="#" onclick="testExample('github.com'); return false;">github.com</a> <a href="#" onclick="testExample('openai.com'); return false;">openai.com</a></p>
           </div>
         </form>
       </div>
+    </div>
+
+    <div class="what-we-test-section">
+      <h2 class="section-title-center">What We Test</h2>
+
+      <div class="feature-grid">
+        <div class="feature-card">
+          <div class="feature-icon">🤖</div>
+          <h3 class="feature-title">AI Crawlers</h3>
+          <p class="feature-description">Tests GPTBot, Claude-Web, Googlebot, and BingBot to ensure your site is accessible to all major AI systems</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">📝</div>
+          <h3 class="feature-title">Content Quality</h3>
+          <p class="feature-description">Validates text content, meta tags, headings, and noscript fallbacks for proper AI understanding</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">🔍</div>
+          <h3 class="feature-title">Structured Data</h3>
+          <p class="feature-description">Checks for JSON-LD schemas and Schema.org markup that help AI understand your content</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">🔄</div>
+          <h3 class="feature-title">Redirects</h3>
+          <p class="feature-description">Automatically follows redirect chains (301, 302, 307, 308) to test your final destination URL</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">🚫</div>
+          <h3 class="feature-title">robots.txt</h3>
+          <p class="feature-description">Validates that AI crawlers aren't being blocked by your robots.txt configuration</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">📊</div>
+          <h3 class="feature-title">Scoring System</h3>
+          <p class="feature-description">Get a 0-100 score based on SEO best practices with actionable recommendations</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="main-card" id="resultsCard" style="margin-top: 40px; display: none;">
 
       <div class="loading" id="loading">
         <div class="spinner"></div>
@@ -947,9 +1355,11 @@
       </div>
 
       <div class="results" id="results">
-        <div class="score-display" id="scoreDisplay">
-          <div class="score-number" id="scoreNumber">0</div>
-          <div class="score-label" id="scoreLabel">Loading...</div>
+        <div class="score-display" id="scoreDisplay"></div>
+
+        <div class="verified-section" id="verifiedSection" style="display: none;">
+          <span class="verified-icon">✓</span>
+          <span class="verified-text">Verified: We Successfully Crawled Your Site</span>
         </div>
 
         <div id="robotsSection"></div>
@@ -1003,11 +1413,23 @@
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
 
-      const url = document.getElementById('urlInput').value;
+      let url = document.getElementById('urlInput').value.trim();
 
+      // Add protocol if missing
+      if (!url.match(/^https?:\/\//i)) {
+        url = 'https://' + url;
+      }
+
+      // Show results card and loading state
+      document.getElementById('resultsCard').style.display = 'block';
       loading.classList.add('show');
       results.classList.remove('show');
       testButton.disabled = true;
+
+      // Scroll to results
+      setTimeout(() => {
+        document.getElementById('resultsCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
 
       try {
         const response = await fetch('/api/test', {
@@ -1034,28 +1456,84 @@
 
     function displayResults(data) {
       const scoreDisplay = document.getElementById('scoreDisplay');
-      const scoreNumber = document.getElementById('scoreNumber');
-      const scoreLabel = document.getElementById('scoreLabel');
+      const avgScore = Math.round(data.averageScore);
 
-      scoreNumber.textContent = Math.round(data.averageScore);
-
-      let label, className;
-      if (data.averageScore >= 80) {
-        label = 'Excellent';
-        className = 'score-excellent';
-      } else if (data.averageScore >= 60) {
-        label = 'Good';
-        className = 'score-good';
-      } else if (data.averageScore >= 40) {
-        label = 'Fair';
-        className = 'score-fair';
+      let badgeLabel, badgeEmoji;
+      if (avgScore >= 90) {
+        badgeLabel = 'SEO Wizard';
+        badgeEmoji = '⚡';
+      } else if (avgScore >= 80) {
+        badgeLabel = 'Full-Stack Wizard';
+        badgeEmoji = '⚡';
+      } else if (avgScore >= 70) {
+        badgeLabel = 'Well Optimized';
+        badgeEmoji = '✓';
+      } else if (avgScore >= 60) {
+        badgeLabel = 'Good Start';
+        badgeEmoji = '👍';
       } else {
-        label = 'Poor';
-        className = 'score-poor';
+        badgeLabel = 'Needs Work';
+        badgeEmoji = '⚠';
       }
 
-      scoreLabel.textContent = label;
-      scoreDisplay.className = 'score-display ' + className;
+      // Build score display HTML
+      let scoreHTML = `
+        <div class="score-content">
+          <div class="score-header">
+            <div class="score-badge-container">
+              <div class="score-circle">
+                <div class="score-number">${avgScore}</div>
+                <div class="score-max">/100</div>
+              </div>
+              <div class="score-badge-label">
+                <span>${badgeEmoji}</span>
+                <span>${badgeLabel}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="mini-crawler-grid">
+            ${data.crawlers.map(crawler => {
+              const score = crawler.error ? 0 : crawler.score;
+              return `
+                <div class="mini-crawler-card">
+                  <div class="mini-crawler-name">${crawler.crawler || crawler.name}</div>
+                  <div class="mini-crawler-score">
+                    ${score}
+                    ${score >= 70 ? '<span class="mini-score-badge">✓</span>' : ''}
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+
+          <div class="rainbow-progress">
+            <div class="rainbow-progress-bar" style="width: ${avgScore}%"></div>
+          </div>
+
+          <div class="share-buttons">
+            <button class="share-btn share-twitter" onclick="shareTwitter()">
+              Share on X
+            </button>
+            <button class="share-btn share-linkedin" onclick="shareLinkedIn()">
+              Share on LinkedIn
+            </button>
+            <button class="share-btn share-copy" onclick="copyLink()" id="copyBtn">
+              Copy Link
+            </button>
+          </div>
+        </div>
+      `;
+
+      scoreDisplay.innerHTML = scoreHTML;
+
+      // Show verified section if average score is good
+      const verifiedSection = document.getElementById('verifiedSection');
+      if (avgScore >= 60) {
+        verifiedSection.style.display = 'flex';
+      } else {
+        verifiedSection.style.display = 'none';
+      }
 
       // Display robots.txt
       const robotsSection = document.getElementById('robotsSection');
@@ -1088,23 +1566,81 @@
         const card = document.createElement('div');
         card.className = 'crawler-card';
 
-        let html = `<div class="crawler-name">${crawler.crawler || crawler.name}</div>`;
+        const crawlerName = crawler.crawler || crawler.name;
+
+        let html = `
+          <div class="crawler-card-header">
+            <h3 class="crawler-name">${crawlerName}</h3>
+            <div class="crawler-score-badge" style="${crawler.error ? 'background: #dc2626;' : ''}">${crawler.error ? 'Error' : crawler.score + '/100'}</div>
+          </div>
+        `;
 
         if (crawler.error) {
-          html += `<p style="color: #dc2626;">Error: ${crawler.error}</p>`;
-        } else {
-          const scoreColor = crawler.score >= 80 ? '#059669' :
-                             crawler.score >= 60 ? '#d97706' :
-                             crawler.score >= 40 ? '#ea580c' : '#dc2626';
+          html += `<div style="background: #fee2e2; border: 1px solid #fca5a5; border-radius: 6px; padding: 16px; margin-bottom: 16px;">`;
+          html += `<p style="color: #dc2626; font-size: 0.95rem; font-weight: 600; margin-bottom: 8px;">⚠ Error: ${escapeHtml(crawler.error)}</p>`;
 
-          html += `<div class="crawler-score" style="color: ${scoreColor}">${crawler.score}/100</div>`;
+          // Show explanation if available
+          if (crawler.errorDetails && crawler.errorDetails.explanation) {
+            html += `<p style="color: #991b1b; font-size: 0.875rem; margin-bottom: 12px; line-height: 1.5;">${escapeHtml(crawler.errorDetails.explanation)}</p>`;
+          }
+
+          // Show diagnostic details in collapsible section
+          if (crawler.errorDetails) {
+            html += `
+              <details style="margin-top: 12px;">
+                <summary style="cursor: pointer; font-size: 0.85rem; color: #991b1b; font-weight: 500;">Show Diagnostic Details</summary>
+                <div style="margin-top: 12px; padding: 12px; background: white; border-radius: 4px; border: 1px solid #fca5a5;">
+            `;
+
+            if (crawler.errorDetails.timestamp) {
+              html += `<p style="font-size: 0.8rem; color: #6b7280; margin-bottom: 6px;"><strong>Timestamp:</strong> ${new Date(crawler.errorDetails.timestamp).toLocaleString()}</p>`;
+            }
+
+            if (crawler.errorDetails.statusCode) {
+              html += `<p style="font-size: 0.8rem; color: #6b7280; margin-bottom: 6px;"><strong>HTTP Status Code:</strong> ${crawler.errorDetails.statusCode}</p>`;
+            }
+
+            if (crawler.errorDetails.attempts && crawler.errorDetails.attempts.length > 0) {
+              html += `<p style="font-size: 0.8rem; color: #6b7280; margin-bottom: 6px;"><strong>Retry Attempts:</strong> ${crawler.errorDetails.attempts.length}</p>`;
+
+              html += `<div style="margin-top: 8px; font-size: 0.75rem; color: #6b7280;">`;
+              crawler.errorDetails.attempts.forEach(att => {
+                const status = att.success ? '✓' : '✗';
+                const color = att.success ? '#059669' : '#dc2626';
+                let resultText = '';
+                if (att.error) {
+                  resultText = '- ' + att.error;
+                } else if (att.statusCode) {
+                  resultText = '- HTTP ' + att.statusCode;
+                } else {
+                  resultText = '- Success';
+                }
+                html += `<div style="margin-bottom: 4px; color: ${color};">${status} Attempt ${att.attempt}: ${att.responseTime}ms ${resultText}</div>`;
+              });
+              html += `</div>`;
+            }
+
+            html += `</div></details>`;
+          }
+
+          html += `</div>`;
+        } else {
+          // Meta tags
+          html += `<div class="crawler-meta">`;
+          if (crawler.hasContent) html += `<span class="meta-tag">✓ ${crawler.contentLength} chars</span>`;
+          if (crawler.hasStructuredData) html += `<span class="meta-tag">✓ ${crawler.structuredDataCount} schemas</span>`;
+          if (crawler.hasNoscript) html += `<span class="meta-tag">✓ Noscript</span>`;
+          html += `</div>`;
+
+          // Checks grid
+          html += `<div class="checks-grid">`;
 
           html += `<div class="check-item ${crawler.hasContent ? 'check-pass' : 'check-fail'}">
-            ${crawler.hasContent ? '✓' : '✗'} Content (${crawler.contentLength} chars)
+            ${crawler.hasContent ? '✓' : '✗'} Content
           </div>`;
 
           html += `<div class="check-item ${crawler.hasNoscript ? 'check-pass' : 'check-fail'}">
-            ${crawler.hasNoscript ? '✓' : '✗'} Noscript fallback
+            ${crawler.hasNoscript ? '✓' : '✗'} Noscript
           </div>`;
 
           html += `<div class="check-item ${crawler.hasStructuredData ? 'check-pass' : 'check-fail'}">
@@ -1120,8 +1656,76 @@
           </div>`;
 
           html += `<div class="check-item ${!crawler.hasLoadingState ? 'check-pass' : 'check-fail'}">
-            ${!crawler.hasLoadingState ? '✓' : '✗'} No loading state
+            ${!crawler.hasLoadingState ? '✓' : '✗'} Loading state
           </div>`;
+
+          html += `</div>`;
+
+          // Show redirects if present
+          if (crawler.redirectChain && crawler.redirectChain.length > 0) {
+            html += `
+              <div style="background: #dbeafe; border: 1px solid #93c5fd; border-radius: 6px; padding: 12px; margin-bottom: 16px;">
+                <div style="font-size: 0.85rem; font-weight: 600; color: #1e40af; margin-bottom: 6px;">Redirects followed:</div>
+            `;
+
+            crawler.redirectChain.forEach(redirect => {
+              html += `
+                <div style="font-size: 0.8rem; color: #1e40af; margin-bottom: 4px; font-family: monospace;">
+                  ${redirect.status}: ${redirect.from} → ${redirect.to}
+                </div>
+              `;
+            });
+
+            html += `</div>`;
+          }
+
+          // Content preview section
+          if (crawler.hasContent || crawler.hasMetaTags) {
+            html += `
+              <div class="content-preview">
+                <div class="content-preview-header">
+                  ✓ Content Successfully Crawled
+                </div>
+            `;
+
+            if (crawler.hasTitle && crawler.titleText) {
+              html += `
+                <div class="content-item">
+                  <div class="content-label">Title:</div>
+                  <div class="content-text">"${escapeHtml(crawler.titleText)}"</div>
+                </div>
+              `;
+            }
+
+            if (crawler.hasDescription && crawler.descriptionText) {
+              html += `
+                <div class="content-item">
+                  <div class="content-label">Meta Description:</div>
+                  <div class="content-text">"${escapeHtml(crawler.descriptionText)}"</div>
+                </div>
+              `;
+            }
+
+            if (crawler.hasH1 && crawler.h1Text) {
+              html += `
+                <div class="content-item">
+                  <div class="content-label">H1 Heading:</div>
+                  <div class="content-text">"${escapeHtml(crawler.h1Text)}"</div>
+                </div>
+              `;
+            }
+
+            if (crawler.hasContent && crawler.contentPreview) {
+              html += `
+                <div class="content-item">
+                  <div class="content-label">Content Preview:</div>
+                  <div class="content-text" style="font-style: italic; color: #6b7280;">${escapeHtml(crawler.contentPreview)}</div>
+                </div>
+              `;
+            }
+
+            html += `</div>`;
+          }
         }
 
         card.innerHTML = html;
@@ -1209,6 +1813,42 @@
       const div = document.createElement('div');
       div.textContent = text;
       return div.innerHTML;
+    }
+
+    function shareTwitter() {
+      const url = window.location.href;
+      const text = "I just tested my website's AI crawler accessibility with CrawlerView!";
+      const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`;
+      window.open(twitterUrl, '_blank', 'width=550,height=420');
+    }
+
+    function shareLinkedIn() {
+      const url = window.location.href;
+      const linkedInUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`;
+      window.open(linkedInUrl, '_blank', 'width=550,height=420');
+    }
+
+    function copyLink() {
+      const url = window.location.href;
+      navigator.clipboard.writeText(url).then(() => {
+        const btn = document.getElementById('copyBtn');
+        btn.textContent = '✓ Copied!';
+        btn.classList.add('copied');
+        setTimeout(() => {
+          btn.textContent = 'Copy Link';
+          btn.classList.remove('copied');
+        }, 2000);
+      }).catch(err => {
+        console.error('Failed to copy:', err);
+      });
+    }
+
+    function testExample(url) {
+      document.getElementById('urlInput').value = url;
+      // Trigger form submission by calling submit() and then manually trigger the event handler
+      const form = document.getElementById('testForm');
+      const event = new Event('submit', { bubbles: true, cancelable: true });
+      form.dispatchEvent(event);
     }
   </script>
 

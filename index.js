@@ -101,7 +101,12 @@ function analyzeHTML(html, crawlerName) {
     hasH1: false,
     hasLoadingState: false,
     issues: [],
-    score: 0
+    score: 0,
+    // Extracted content
+    titleText: '',
+    descriptionText: '',
+    h1Text: '',
+    contentPreview: ''
   };
 
   const bodyMatch = html.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
@@ -116,6 +121,7 @@ function analyzeHTML(html, crawlerName) {
 
     results.hasContent = textContent.length > 200;
     results.contentLength = textContent.length;
+    results.contentPreview = textContent.substring(0, 250);
 
     if (textContent.length < 200) {
       results.issues.push(`Very little text content (${textContent.length} chars)`);
@@ -145,15 +151,35 @@ function analyzeHTML(html, crawlerName) {
     results.issues.push('No structured data (JSON-LD) found');
   }
 
-  results.hasTitle = /<title[^>]*>/.test(html);
-  results.hasDescription = /<meta\s+name="description"/i.test(html);
+  // Extract title
+  const titleMatch = html.match(/<title[^>]*>([\s\S]*?)<\/title>/i);
+  if (titleMatch) {
+    results.hasTitle = true;
+    results.titleText = titleMatch[1].replace(/\s+/g, ' ').trim();
+  } else {
+    results.issues.push('Missing <title> tag');
+  }
+
+  // Extract meta description
+  const descMatch = html.match(/<meta\s+name=["']description["']\s+content=["']([\s\S]*?)["']/i);
+  if (descMatch) {
+    results.hasDescription = true;
+    results.descriptionText = descMatch[1].replace(/\s+/g, ' ').trim();
+  } else {
+    results.issues.push('Missing meta description');
+  }
+
   results.hasMetaTags = results.hasTitle && results.hasDescription;
 
-  if (!results.hasTitle) results.issues.push('Missing <title> tag');
-  if (!results.hasDescription) results.issues.push('Missing meta description');
-
-  results.hasH1 = /<h1[^>]*>/.test(html);
-  if (!results.hasH1) results.issues.push('No <h1> heading');
+  // Extract H1
+  const h1Match = html.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i);
+  if (h1Match) {
+    results.hasH1 = true;
+    const h1Content = h1Match[1].replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
+    results.h1Text = h1Content;
+  } else {
+    results.issues.push('No <h1> heading');
+  }
 
   const loadingPatterns = [
     /class="[^"]*loading[^"]*"/i,
@@ -215,6 +241,85 @@ async function testRobotsTxt(baseUrl) {
   }
 }
 
+function getErrorExplanation(statusCode, errorMessage) {
+  const explanations = {
+    429: 'The site is rate-limiting requests. This is typically the site\'s protection against bots, not an issue with our crawler. Try again in a few minutes.',
+    403: 'The site is blocking this crawler. The site may have bot protection or specifically block this user agent.',
+    503: 'The site is temporarily unavailable or overloaded. This is a server-side issue, not a crawler problem.',
+    502: 'Bad gateway - the site\'s server is having issues. This is a temporary server problem.',
+    504: 'Gateway timeout - the site took too long to respond. The site may be slow or having server issues.',
+    'ECONNREFUSED': 'Connection refused - the site is not accepting connections. The site may be down or blocking the request.',
+    'ETIMEDOUT': 'Request timed out - the site took too long to respond (>10 seconds). The site may be slow or unresponsive.',
+    'ENOTFOUND': 'DNS lookup failed - the domain name could not be resolved. Check if the URL is correct.',
+    'ECONNRESET': 'Connection reset - the site closed the connection unexpectedly. This could be bot protection.'
+  };
+
+  if (explanations[statusCode]) return explanations[statusCode];
+  if (errorMessage && errorMessage.includes('timeout')) return explanations['ETIMEDOUT'];
+  if (errorMessage && errorMessage.includes('ECONNREFUSED')) return explanations['ECONNREFUSED'];
+  if (errorMessage && errorMessage.includes('ENOTFOUND')) return explanations['ENOTFOUND'];
+  if (errorMessage && errorMessage.includes('ECONNRESET')) return explanations['ECONNRESET'];
+
+  return 'An unexpected error occurred while trying to crawl this site.';
+}
+
+async function fetchWithRetry(url, userAgent, maxRetries = 3) {
+  const attempts = [];
+
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    const startTime = Date.now();
+
+    try {
+      const response = await fetchURL(url, userAgent);
+      const responseTime = Date.now() - startTime;
+
+      // Check if this is an HTTP error that shouldn't be retried (4xx, 5xx)
+      const isHttpError = response.statusCode >= 400;
+      const shouldRetry = !isHttpError && response.statusCode !== 200;
+
+      attempts.push({
+        attempt,
+        success: !isHttpError,
+        statusCode: response.statusCode,
+        responseTime,
+        timestamp: new Date().toISOString()
+      });
+
+      // If it's an HTTP error (4xx, 5xx), don't retry - return immediately
+      if (isHttpError || response.statusCode === 200) {
+        return { response, attempts };
+      }
+
+      // For other non-200 codes (redirects, etc.), continue to retry
+      if (attempt < maxRetries && shouldRetry) {
+        const delay = Math.pow(2, attempt - 1) * 1000;
+        await new Promise(resolve => setTimeout(resolve, delay));
+        continue;
+      }
+
+      return { response, attempts };
+    } catch (error) {
+      const responseTime = Date.now() - startTime;
+
+      attempts.push({
+        attempt,
+        success: false,
+        error: error.message,
+        responseTime,
+        timestamp: new Date().toISOString()
+      });
+
+      // Retry on network errors (timeout, connection refused, etc.)
+      if (attempt < maxRetries) {
+        const delay = Math.pow(2, attempt - 1) * 1000; // Exponential backoff: 1s, 2s, 4s
+        await new Promise(resolve => setTimeout(resolve, delay));
+      } else {
+        throw error;
+      }
+    }
+  }
+}
+
 async function testURL(url) {
   const results = {
     url,
@@ -224,23 +329,42 @@ async function testURL(url) {
 
   for (const [name, userAgent] of Object.entries(AI_CRAWLERS)) {
     try {
-      const response = await fetchURL(url, userAgent);
+      const { response, attempts } = await fetchWithRetry(url, userAgent);
 
       if (response.statusCode !== 200) {
+        const explanation = getErrorExplanation(response.statusCode);
         results.crawlers.push({
           name,
           error: `HTTP ${response.statusCode}`,
+          errorDetails: {
+            statusCode: response.statusCode,
+            explanation,
+            attempts,
+            timestamp: new Date().toISOString()
+          },
           score: 0
         });
         continue;
       }
 
       const analysis = analyzeHTML(response.html, name);
+      analysis.redirectChain = response.redirectChain;
+      analysis.diagnostics = {
+        attempts,
+        finalResponseTime: attempts[attempts.length - 1].responseTime
+      };
       results.crawlers.push(analysis);
     } catch (error) {
+      const explanation = getErrorExplanation(null, error.message);
       results.crawlers.push({
         name,
         error: error.message,
+        errorDetails: {
+          errorMessage: error.message,
+          explanation,
+          attempts: [],
+          timestamp: new Date().toISOString()
+        },
         score: 0
       });
     }
